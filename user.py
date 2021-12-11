@@ -2,7 +2,7 @@
 
 Tracks all your spending and transactions by categories.
 '''
-
+import os
 from category import Category
 
 class User:
@@ -13,28 +13,39 @@ class User:
 
     balance: sum of all balances in categories
     budget_summary: for category in categories print category.summary
+    TODO: change error messages
     '''
 
     def __init__(self,name):
 
-    # check if directory user exists if it does not create one
-    # check if given user_name already exists in directory users if yes raise exception
+        if not os.path.isdir("users"):
+            os.makedirs("users", exist_ok=True)
+
+        try:
+            open("users\\user_"+name.lower()+".txt",'x',encoding="utf8")
+        except FileExistsError:
+            print("User with name "+name+" already exists. Please use another name.")
 
         self.name = name
         self.balance = 0.0
         self.spent = 0.0
         self.categories = []
-        self.file_name = "user_"+self.name.lower()+".txt"
+        self.file_name = "users\\user_"+self.name.lower()+".txt"
 
         with open(self.file_name,'w',encoding="utf8") as user_file:
             user_file.write(self.name+"'s transactions"+"\n")
+
+    def category_error_message(self,category_name):
+        '''print error message for not existing category'''
+
+        print(self.name+ " does not have "+category_name+" category in the budget.")
 
     def add_category(self,category_name):
         '''adding category in user's budget'''
 
         category = [category for category in self.categories if category.name == category_name]
         if category:
-            print(self.name+" already has this category in the budget.")
+            print(self.name+" already has "+category_name+" category in the budget.")
         else:
             self.categories.append(Category(category_name))
 
@@ -47,7 +58,7 @@ class User:
             print("*** "+self.name+"'s "+category_name+" ***")
             print(category)
         else:
-            print(self.name+ " does not have this category in the budget.")
+            self.category_error_message(category_name)
 
     def budget_summary(self):
         '''prints budget summary'''
@@ -68,13 +79,13 @@ class User:
     def withdraw(self,amount,category_name,description=""):
         '''withdraw method'''
 
+        transaction = {"amount":-1*amount,"description":description}
         category = [category for category in self.categories if category.name == category_name]
 
         if category:
             category = category[0]
 
             if self.check_funds(amount,category):
-                transaction = {"amount":-1*amount,"description":description}
                 category.transactions.append(transaction)
                 category.balance -= round(amount,2)
                 category.spent += round(amount,2)
@@ -88,10 +99,11 @@ class User:
 
             print("Withdraw unsuccessful.")
             print(self.name+" does not have enough funds for this action.")
+            print(str(transaction))
             return False
 
         print("Withdraw unsuccessful.")
-        print(self.name+" does not have this category in budget.")
+        self.category_error_message(category_name)
         return False
 
     def check_funds(self,amount,category):
@@ -118,17 +130,19 @@ class User:
 
         else:
             print("Deposit unsuccessful.")
-            print(self.name+" does not have this category in budget.")
+            self.category_error_message(category_name)
 
     def transfer(self,amount,source_category_name,dest_category_name):
         '''transfers money from one to another category if possible'''
+
+        transaction = {"amount":amount,"description":"Transfer from {self.name} to {dest_category.name}"}
 
         source_category = [category for category in self.categories if category.name == source_category_name]
         if source_category:
             source_category = source_category[0]
         else:
             print("Transfer unsuccessful.")
-            print(self.name+" does not have source category in the budget.")
+            self.category_error_message(source_category_name)
             return False
 
         dest_category = [category for category in self.categories if category.name == dest_category_name]
@@ -136,16 +150,19 @@ class User:
             dest_category = dest_category[0]
         else:
             print("Transfer unsuccessful.")
-            print(self.name+" does not have destination category in the budget.")
+            self.category_error_message(dest_category_name)
             return False
 
         if source_category.withdraw(amount,"Transfer to {dest_category.name}"):
             dest_category.deposit(amount,"Transfer from {self.name}")
 
-            transaction = {"amount":amount,"description":"Transfer from {self.name}"}
-
             with open(self.file_name,'a',encoding="utf8") as user_file:
                 user_file.writelines([str(transaction),"\n"])
 
             return True
-        return False
+        
+        else:
+            print("Transfer unsuccessful.")
+            print(self.name+" does not have enough funds for this action.")
+            print(str(transaction))
+            return False
