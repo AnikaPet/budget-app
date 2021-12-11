@@ -13,8 +13,6 @@ class User:
 
     balance: sum of all balances in categories
     budget_summary: for category in categories print category.summary
-    TODO: replace error messages with raising exceptions
-    TODO: figure out how to write transactions in json file
     '''
 
     def __init__(self,name):
@@ -25,10 +23,10 @@ class User:
         self.name = name
         self.balance = 0.0
         self.categories = []
+        self.file_name = "user_"+self.name.lower()+".txt"
 
-        file_name = "user_"+self.name.lower()+".txt"
-        with open(file_name,'w',encoding="utf8") as user_file:
-            user_file.writelines(self.name+"'s transactions")
+        with open(self.file_name,'w',encoding="utf8") as user_file:
+            user_file.write(self.name+"'s transactions"+"\n")
 
     def add_category(self,category_name):
         '''adding category in user's budget'''
@@ -63,6 +61,10 @@ class User:
                 category.transactions.append(transaction)
                 category.balance -= round(amount,2)
                 category.spent += round(amount,2)
+
+                with open(self.file_name,'a',encoding="utf8") as user_file:
+                    user_file.writelines([str(transaction),"\n"])
+
                 return True
 
             print("Withdraw unsuccessful.")
@@ -90,6 +92,10 @@ class User:
             transaction = {"amount":amount,"description":descripton}
             category.transactions.append(transaction)
             category.balance += round(amount,2)
+
+            with open(self.file_name,'a',encoding="utf8") as user_file:
+                    user_file.writelines([str(transaction),"\n"])
+
         else:
             print("Deposit unsuccessful.")
             print(self.name+" does not have this category in budget.")
@@ -115,5 +121,11 @@ class User:
 
         if source_category.withdraw(amount,"Transfer to {dest_category.name}"):
             dest_category.deposit(amount,"Transfer from {self.name}")
+
+            transaction = {"amount":amount,"description":"Transfer from {self.name}"}
+
+            with open(self.file_name,'a',encoding="utf8") as user_file:
+                user_file.writelines([str(transaction),"\n"])
+
             return True
         return False
