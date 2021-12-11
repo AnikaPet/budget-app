@@ -22,6 +22,7 @@ class User:
 
         self.name = name
         self.balance = 0.0
+        self.spent = 0.0
         self.categories = []
         self.file_name = "user_"+self.name.lower()+".txt"
 
@@ -48,6 +49,22 @@ class User:
         else:
             print(self.name+ " does not have this category in the budget.")
 
+    def budget_summary(self):
+        '''prints budget summary'''
+
+        lines = []
+        lines.append("*** "+self.name+"'s budget summary"+" ***")
+        for category in self.categories:
+            category.percent = round((category.spent/self.spent)*100)
+            lines.append(category.name+": "+str(category.percent)+"%")
+
+        lines.append("------------------------")
+        lines.append("Balance: "+str(self.balance))
+        lines.append("Spent: "+str(self.spent))
+
+        result = "\n".join(lines)
+        print(result)
+
     def withdraw(self,amount,category_name,description=""):
         '''withdraw method'''
 
@@ -61,6 +78,8 @@ class User:
                 category.transactions.append(transaction)
                 category.balance -= round(amount,2)
                 category.spent += round(amount,2)
+                self.spent += round(amount,2)
+                self.balance -= round(amount,2)
 
                 with open(self.file_name,'a',encoding="utf8") as user_file:
                     user_file.writelines([str(transaction),"\n"])
@@ -92,6 +111,7 @@ class User:
             transaction = {"amount":amount,"description":descripton}
             category.transactions.append(transaction)
             category.balance += round(amount,2)
+            self.balance += round(amount,2)
 
             with open(self.file_name,'a',encoding="utf8") as user_file:
                     user_file.writelines([str(transaction),"\n"])
