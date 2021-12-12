@@ -210,7 +210,7 @@ class User:
                 name of destionation category for transfer
         '''
 
-        transaction = {"amount":amount,"description":"Transfer from {self.name} to {dest_category.name}"}
+        transaction = {"amount":amount,"description":"Transfer from "+source_category_name+" to "+dest_category_name}
 
         source_category = [category for category in self.categories if category.name == source_category_name]
         if source_category:
@@ -228,8 +228,8 @@ class User:
             self.category_error_message(dest_category_name)
             return False
 
-        if source_category.withdraw(amount,"Transfer to {dest_category.name}"):
-            dest_category.deposit(amount,"Transfer from {self.name}")
+        if self.withdraw(amount,source_category_name,"Transfer to "+dest_category_name):
+            self.deposit(amount,dest_category_name,"Transfer from "+dest_category_name)
 
             with open(self.file_name,'a',encoding="utf8") as user_file:
                 user_file.writelines([str(transaction),"\n"])
