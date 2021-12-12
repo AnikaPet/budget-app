@@ -41,7 +41,7 @@ class Category:
 
         for transaction in self.transactions:
             lines.append(transaction['description'][0:20]+" "+str(transaction['amount']))
-        lines.append("---------------")
+        lines.append("------------------------")
         lines.append("balance: "+str(self.balance)+"\n")
 
         return "\n".join(lines)

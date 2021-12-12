@@ -67,7 +67,7 @@ class User:
         with open(self.file_name,'w',encoding="utf8") as user_file:
             user_file.write(self.name+"'s transactions"+"\n") #creates .txt file for each user
 
-    def category_error_message(self,category_name):
+    def __category_error_message(self,category_name):
         '''prints error message for not existing category'''
 
         print(self.name+ " does not have "+category_name+" category in the budget.")
@@ -90,7 +90,7 @@ class User:
             print("*** "+self.name+"'s "+category_name+" ***")
             print(category)
         else:
-            self.category_error_message(category_name)
+            self.__category_error_message(category_name)
 
     def budget_summary(self):
         '''prints budget summary - categories with percentages
@@ -135,7 +135,7 @@ class User:
         if category:
             category = category[0]
 
-            if self.check_funds(amount,category):
+            if self.__check_funds(amount,category):
                 category.transactions.append(transaction)
                 category.balance -= round(amount,2)
                 category.spent += round(amount,2)
@@ -153,10 +153,10 @@ class User:
             return False
 
         print("Withdraw unsuccessful.")
-        self.category_error_message(category_name)
+        self.__category_error_message(category_name)
         return False
 
-    def check_funds(self,amount,category):
+    def __check_funds(self,amount,category):
         '''checks if there is enough funds for transaction
 
         Parameters
@@ -195,7 +195,7 @@ class User:
 
         else:
             print("Deposit unsuccessful.")
-            self.category_error_message(category_name)
+            self.__category_error_message(category_name)
 
     def transfer(self,amount,source_category_name,dest_category_name):
         '''transfers money from one to another category if possible
@@ -217,7 +217,7 @@ class User:
             source_category = source_category[0]
         else:
             print("Transfer unsuccessful.")
-            self.category_error_message(source_category_name)
+            self.__category_error_message(source_category_name)
             return False
 
         dest_category = [category for category in self.categories if category.name == dest_category_name]
@@ -225,7 +225,7 @@ class User:
             dest_category = dest_category[0]
         else:
             print("Transfer unsuccessful.")
-            self.category_error_message(dest_category_name)
+            self.__category_error_message(dest_category_name)
             return False
 
         if self.withdraw(amount,source_category_name,"Transfer to "+dest_category_name):
