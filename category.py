@@ -1,22 +1,31 @@
-'''Class category'''
+'''Class Category'''
 
 class Category:
     '''Class is used to represent category in the budget.
 
     Category is identified by the name. Names are case sensitive.
-    A brief summary of its purpose and behavior
-    Any public methods, along with a brief description
-    Any class properties (attributes)
+
+    Attributes
+    ----------
+    name : str
+            name of the category
+    balance : float
+            current balance for single category
+    spent : float
+            how much money is spent in this category
+    percent : int
+            how many percents category represents in user's budget
+    transactions : list
+            each element is dictionary representing one transaction
+            transaction has two keys: amount(float) and description(optinal,default is empty string)
     '''
 
     def __init__(self,name):
         '''
-        A brief description of what the method is and what it’s used for
-        Any arguments (both required and optional) that are passed including keyword arguments
-        Label any arguments that are considered optional or have a default value
-        Any side effects that occur when executing the method
-        Any exceptions that are raised
-        Any restrictions on when the method can be called
+        Parameters
+        -----------
+        name : str
+                name of the category
         '''
 
         self.name = name
@@ -26,6 +35,7 @@ class Category:
         self.transactions = []
 
     def __str__(self):
+        '''prints all transactions from one category and current balance'''
 
         lines = []
 

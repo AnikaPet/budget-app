@@ -1,25 +1,57 @@
-'''Small budget app.
-
-Tracks all your spending and transactions by categories.
-'''
+'''Class User'''
 import os
 from category import Category
 
 class User:
     '''Class that is used to represent single user.
 
-    Brief summary.
-    Each user has it's own file. Write every transaction(dictionary) in json file.
+    Each user is identified by name. Names are case sensitive.
 
-    balance: sum of all balances in categories
-    budget_summary: for category in categories print category.summary
-    TODO: change error messages
+    Attributes
+    -----------
+    name : str
+            name of the user
+    balance : float
+            current balance
+    categories : list
+            list of Category objects representing categories in user's budget
+    file_name: str
+            name of user's .txt file containing all transactions
+
+    Methods
+    --------
+    category_error_message(category_name)
+        Prints error message indicating that category with
+        name category_name does not exist in user's budget.
+    add_category(category_name)
+        Creates Category object and adds it to the categories list if possible.
+    print_category(category_name)
+        Calls __str__ method for each Category object from categories list.
+    budget_summary()
+        Print summary of user's budget.
+    withdraw(amount,category_name,description="")
+        Withdraws money from specific category if possible.
+    deposit(amount,category_name,description="")
+        Deposits money to specific category if possible.
+    transfer(amount,source_category_name,dest_category_name)
+        Transfers money from one to another category if possible.
     '''
 
     def __init__(self,name):
+        '''
+        Parameters
+        -----------
+        name : str
+                name of user
+
+        Raises
+        -------
+        FileExistsError
+            If user with name given as parameter already exists.
+        '''
 
         if not os.path.isdir("users"):
-            os.makedirs("users", exist_ok=True)
+            os.makedirs("users", exist_ok=True) #creates users directory
 
         try:
             open("users\\user_"+name.lower()+".txt",'x',encoding="utf8")
@@ -33,15 +65,15 @@ class User:
         self.file_name = "users\\user_"+self.name.lower()+".txt"
 
         with open(self.file_name,'w',encoding="utf8") as user_file:
-            user_file.write(self.name+"'s transactions"+"\n")
+            user_file.write(self.name+"'s transactions"+"\n") #creates .txt file for each user
 
     def category_error_message(self,category_name):
-        '''print error message for not existing category'''
+        '''prints error message for not existing category'''
 
         print(self.name+ " does not have "+category_name+" category in the budget.")
 
     def add_category(self,category_name):
-        '''adding category in user's budget'''
+        '''adds category in user's budget if category does not exist in user's budget'''
 
         category = [category for category in self.categories if category.name == category_name]
         if category:
@@ -50,7 +82,7 @@ class User:
             self.categories.append(Category(category_name))
 
     def print_category(self,category_name):
-        '''printing category if exists'''
+        '''prints category if possible'''
 
         category = [category for category in self.categories if category.name == category_name]
         if category:
@@ -61,7 +93,7 @@ class User:
             self.category_error_message(category_name)
 
     def budget_summary(self):
-        '''prints budget summary'''
+        '''prints budget summary - categories with percentages'''
 
         lines = []
         lines.append("*** "+self.name+"'s budget summary"+" ***")
@@ -77,7 +109,17 @@ class User:
         print(result)
 
     def withdraw(self,amount,category_name,description=""):
-        '''withdraw method'''
+        '''withdraws money from category if possible
+
+        Parameters
+        -----------
+        amount: float
+                amount of money
+        category_name : str
+                name of the category
+        description :
+                description of transaction
+        '''
 
         transaction = {"amount":-1*amount,"description":description}
         category = [category for category in self.categories if category.name == category_name]
@@ -107,13 +149,28 @@ class User:
         return False
 
     def check_funds(self,amount,category):
-        '''checks if there is enough funds for transaction'''
+        '''checks if there is enough funds for transaction
+
+        Parameters
+        -----------
+        amount : float
+                amount of money
+        category : Category
+        '''
 
         return category.balance>=amount
 
     def deposit(self,amount,category_name,descripton=""):
-        '''
-        deposit money
+        ''' deposits money to category if possible
+
+        Parameters
+        -----------
+        amount : float
+                amount of money
+        category_name : str
+                name of the category
+        description : str
+                description of transaction
         '''
 
         category = [category for category in self.categories if category.name == category_name]
@@ -126,14 +183,24 @@ class User:
             self.balance += round(amount,2)
 
             with open(self.file_name,'a',encoding="utf8") as user_file:
-                    user_file.writelines([str(transaction),"\n"])
+                user_file.writelines([str(transaction),"\n"])
 
         else:
             print("Deposit unsuccessful.")
             self.category_error_message(category_name)
 
     def transfer(self,amount,source_category_name,dest_category_name):
-        '''transfers money from one to another category if possible'''
+        '''transfers money from one to another category if possible
+
+        Parameters
+        -----------
+        amount : float
+                amount money
+        source_category_name : str
+                name of source category for transfer
+        dest_category_name : str
+                name of destionation category for transfer
+        '''
 
         transaction = {"amount":amount,"description":"Transfer from {self.name} to {dest_category.name}"}
 
@@ -160,7 +227,7 @@ class User:
                 user_file.writelines([str(transaction),"\n"])
 
             return True
-        
+
         else:
             print("Transfer unsuccessful.")
             print(self.name+" does not have enough funds for this action.")
