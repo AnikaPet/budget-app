@@ -93,13 +93,21 @@ class User:
             self.category_error_message(category_name)
 
     def budget_summary(self):
-        '''prints budget summary - categories with percentages'''
+        '''prints budget summary - categories with percentages
+        Raises
+        -------
+        ZeroDivisonError:
+                If user didn't spent any money in category.
+        '''
 
         lines = []
         lines.append("*** "+self.name+"'s budget summary"+" ***")
         for category in self.categories:
-            category.percent = round((category.spent/self.spent)*100)
-            lines.append(category.name+": "+str(category.percent)+"%")
+            try:
+                category.percent = round((category.spent/self.spent)*100)
+                lines.append(category.name+": "+str(category.percent)+"%")
+            except ZeroDivisionError:
+                lines.append(category.name+": 0%")
 
         lines.append("------------------------")
         lines.append("Balance: "+str(self.balance))
