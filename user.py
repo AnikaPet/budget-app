@@ -84,7 +84,7 @@ class User:
     def print_category(self,category_name):
         '''prints category if possible'''
 
-        category = [category for category in self.categories if category.name == category_name]
+        category = [category for category in self.categories if category.name.lower() == category_name.lower()]
         if category:
             category = category[0]
             print("*** "+self.name+"'s "+category_name+" ***")
