@@ -3,7 +3,7 @@
 class Category:
     '''Class is used to represent category in the budget.
 
-    Category is identified by the name. Names are case sensitive.
+    Category is identified by the name. Names are not case sensitive.
 
     Attributes
     ----------
