@@ -5,7 +5,7 @@ from category import Category
 class User:
     '''Class that is used to represent single user.
 
-    Each user is identified by name. Names are case sensitive.
+    Each user is identified by name. Names are not case sensitive.
 
     Attributes
     -----------
